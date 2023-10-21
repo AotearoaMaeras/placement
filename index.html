@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/filter.css">
+<link rel="stylesheet" href="css/nouislider.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Aotearoa Maraes</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/AotearoaRegions_1.js"></script>
+        <script src="data/SeaRiseProjectionsOfWaikato_2.js"></script>
+        <script src="data/Aotearoamaeras_3.js"></script>
+        <script src="data/WaikatoMaraes_4.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#0fb112',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#0fb112',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'feet',
+            secondaryLengthUnit: 'miles',
+            primaryAreaUnit: 'sqfeet',
+            secondaryAreaUnit: 'sqmiles'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        function pop_AotearoaRegions_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Regions</th>\
+                        <td>' + (feature.properties['Regions'] !== null ? autolinker.link(feature.properties['Regions'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_AotearoaRegions_1_0() {
+            return {
+                pane: 'pane_AotearoaRegions_1',
+                opacity: 1,
+                color: 'rgba(77,175,74,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_AotearoaRegions_1');
+        map.getPane('pane_AotearoaRegions_1').style.zIndex = 401;
+        map.getPane('pane_AotearoaRegions_1').style['mix-blend-mode'] = 'normal';
+        var layer_AotearoaRegions_1 = new L.geoJson(json_AotearoaRegions_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_AotearoaRegions_1',
+            layerName: 'layer_AotearoaRegions_1',
+            pane: 'pane_AotearoaRegions_1',
+            onEachFeature: pop_AotearoaRegions_1,
+            style: style_AotearoaRegions_1_0,
+        });
+        bounds_group.addLayer(layer_AotearoaRegions_1);
+        map.addLayer(layer_AotearoaRegions_1);
+        function pop_SeaRiseProjectionsOfWaikato_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">siteId</th>\
+                        <td>' + (feature.properties['siteId'] !== null ? autolinker.link(feature.properties['siteId'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">year</th>\
+                        <td>' + (feature.properties['year'] !== null ? autolinker.link(feature.properties['year'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">p50</th>\
+                        <td>' + (feature.properties['p50'] !== null ? autolinker.link(feature.properties['p50'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">lon</th>\
+                        <td>' + (feature.properties['lon'] !== null ? autolinker.link(feature.properties['lon'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">lat</th>\
+                        <td>' + (feature.properties['lat'] !== null ? autolinker.link(feature.properties['lat'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">measurementName</th>\
+                        <td>' + (feature.properties['measurementName'] !== null ? autolinker.link(feature.properties['measurementName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_SeaRiseProjectionsOfWaikato_2_0() {
+            return {
+                pane: 'pane_SeaRiseProjectionsOfWaikato_2',
+                radius: 2.0,
+                opacity: 1,
+                color: 'rgba(114,102,241,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(45,194,217,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_SeaRiseProjectionsOfWaikato_2');
+        map.getPane('pane_SeaRiseProjectionsOfWaikato_2').style.zIndex = 402;
+        map.getPane('pane_SeaRiseProjectionsOfWaikato_2').style['mix-blend-mode'] = 'normal';
+        var layer_SeaRiseProjectionsOfWaikato_2 = new L.geoJson(json_SeaRiseProjectionsOfWaikato_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SeaRiseProjectionsOfWaikato_2',
+            layerName: 'layer_SeaRiseProjectionsOfWaikato_2',
+            pane: 'pane_SeaRiseProjectionsOfWaikato_2',
+            onEachFeature: pop_SeaRiseProjectionsOfWaikato_2,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_SeaRiseProjectionsOfWaikato_2_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_SeaRiseProjectionsOfWaikato_2);
+        map.addLayer(layer_SeaRiseProjectionsOfWaikato_2);
+        function pop_Aotearoamaeras_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Marae</th>\
+                        <td>' + (feature.properties['Marae'] !== null ? autolinker.link(feature.properties['Marae'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">longtitude</th>\
+                        <td>' + (feature.properties['longtitude'] !== null ? autolinker.link(feature.properties['longtitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">latitude</th>\
+                        <td>' + (feature.properties['latitude'] !== null ? autolinker.link(feature.properties['latitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Aotearoamaeras_3_0() {
+            return {
+                pane: 'pane_Aotearoamaeras_3',
+                radius: 3.0,
+                opacity: 1,
+                color: 'rgba(255,255,255,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(243,140,80,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Aotearoamaeras_3');
+        map.getPane('pane_Aotearoamaeras_3').style.zIndex = 403;
+        map.getPane('pane_Aotearoamaeras_3').style['mix-blend-mode'] = 'normal';
+        var layer_Aotearoamaeras_3 = new L.geoJson(json_Aotearoamaeras_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Aotearoamaeras_3',
+            layerName: 'layer_Aotearoamaeras_3',
+            pane: 'pane_Aotearoamaeras_3',
+            onEachFeature: pop_Aotearoamaeras_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Aotearoamaeras_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Aotearoamaeras_3);
+        map.addLayer(layer_Aotearoamaeras_3);
+        function pop_WaikatoMaraes_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Marae</th>\
+                        <td>' + (feature.properties['Marae'] !== null ? autolinker.link(feature.properties['Marae'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">longtitude</th>\
+                        <td>' + (feature.properties['longtitude'] !== null ? autolinker.link(feature.properties['longtitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">latitude</th>\
+                        <td>' + (feature.properties['latitude'] !== null ? autolinker.link(feature.properties['latitude'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_WaikatoMaraes_4_0() {
+            return {
+                pane: 'pane_WaikatoMaraes_4',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(250,21,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_WaikatoMaraes_4');
+        map.getPane('pane_WaikatoMaraes_4').style.zIndex = 404;
+        map.getPane('pane_WaikatoMaraes_4').style['mix-blend-mode'] = 'normal';
+        var layer_WaikatoMaraes_4 = new L.geoJson(json_WaikatoMaraes_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_WaikatoMaraes_4',
+            layerName: 'layer_WaikatoMaraes_4',
+            pane: 'pane_WaikatoMaraes_4',
+            onEachFeature: pop_WaikatoMaraes_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_WaikatoMaraes_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_WaikatoMaraes_4);
+        map.addLayer(layer_WaikatoMaraes_4);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Aotearoa Maraes</h2>';
+            };
+            title.addTo(map);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'<img src="legend/WaikatoMaraes_4.png" /> Waikato Maraes': layer_WaikatoMaraes_4,'<img src="legend/Aotearoamaeras_3.png" /> Aotearoa maeras': layer_Aotearoamaeras_3,'<img src="legend/SeaRiseProjectionsOfWaikato_2.png" /> Sea Rise Projections Of Waikato': layer_SeaRiseProjectionsOfWaikato_2,'<img src="legend/AotearoaRegions_1.png" /> Aotearoa Regions': layer_AotearoaRegions_1,"Google Satellite": layer_GoogleSatellite_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className="col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = {"Marae": "str","Regions": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Marae = document.createElement('div');
+            div_Marae.id = "div_Marae";
+            div_Marae.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Marae);
+            sel_Marae = document.createElement('select');
+            sel_Marae.multiple = true;
+            sel_Marae.size = 10;
+            sel_Marae.id = "sel_Marae";
+            var Marae_options_str = "<option value='' unselected></option>";
+            sel_Marae.onchange = function(){filterFunc()};
+            Marae_options_str  += '<option value="Aruka Marae (W46)">Aruka Marae (W46)</option>';
+            Marae_options_str  += '<option value="Hinemaurea ki Wharek?hika Marae (G5)">Hinemaurea ki Wharek?hika Marae (G5)</option>';
+            Marae_options_str  += '<option value="Hinemihi Marae NHB35)">Hinemihi Marae NHB35)</option>';
+            Marae_options_str  += '<option value="Hinerupe Marae (G4)">Hinerupe Marae (G4)</option>';
+            Marae_options_str  += '<option value="Hinetamatea Pa (G41)">Hinetamatea Pa (G41)</option>';
+            Marae_options_str  += '<option value="Hiruharama Hou Marae (N136)">Hiruharama Hou Marae (N136)</option>';
+            Marae_options_str  += '<option value="Hiruharama Marae (G11)">Hiruharama Marae (G11)</option>';
+            Marae_options_str  += '<option value="Hongoeka Marae (WLG13)">Hongoeka Marae (WLG13)</option>';
+            Marae_options_str  += '<option value="Iritekura Marae (G36)">Iritekura Marae (G36)</option>';
+            Marae_options_str  += '<option value="Kahungunu Community Marae (NHB8)">Kahungunu Community Marae (NHB8)</option>';
+            Marae_options_str  += '<option value="Kaikou Marae (N126)">Kaikou Marae (N126)</option>';
+            Marae_options_str  += '<option value="Kaipo Marae (TM34)">Kaipo Marae (TM34)</option>';
+            Marae_options_str  += '<option value="Kawiu Marae (WLG6)">Kawiu Marae (WLG6)</option>';
+            Marae_options_str  += '<option value="Kohupatiki Marae (NHB48)">Kohupatiki Marae (NHB48)</option>';
+            Marae_options_str  += '<option value="Koraunui Marae (WLG25)">Koraunui Marae (WLG25)</option>';
+            Marae_options_str  += '<option value="Korohe Marae (W127)">Korohe Marae (W127)</option>';
+            Marae_options_str  += '<option value="Kuha Pa Marae (NHB16)">Kuha Pa Marae (NHB16)</option>';
+            Marae_options_str  += '<option value="Kutarere Marae (BOP83)">Kutarere Marae (BOP83)</option>';
+            Marae_options_str  += '<option value="Maketu Marae (W42)">Maketu Marae (W42)</option>';
+            Marae_options_str  += '<option value="Maniaiti Marae (W137)">Maniaiti Marae (W137)</option>';
+            Marae_options_str  += '<option value="Manutahi Marae (TM14)">Manutahi Marae (TM14)</option>';
+            Marae_options_str  += '<option value="Matihetihe Marae (N82)">Matihetihe Marae (N82)</option>';
+            Marae_options_str  += '<option value="Motairehe Marae (A3)">Motairehe Marae (A3)</option>';
+            Marae_options_str  += '<option value="Motatau Marae (N38)">Motatau Marae (N38)</option>';
+            Marae_options_str  += '<option value="Moteo Marae (NHB45)">Moteo Marae (NHB45)</option>';
+            Marae_options_str  += '<option value="Ngati Manawa Marae (N85)">Ngati Manawa Marae (N85)</option>';
+            Marae_options_str  += '<option value="Ngawari Pa (G51)">Ngawari Pa (G51)</option>';
+            Marae_options_str  += '<option value="Ohaki Marae (W)">Ohaki Marae (W)</option>';
+            Marae_options_str  += '<option value="Omaio Marae  (BOP125)">Omaio Marae  (BOP125)</option>';
+            Marae_options_str  += '<option value="Orimupiko Marae (TM8)">Orimupiko Marae (TM8)</option>';
+            Marae_options_str  += '<option value="Otiria Marae (N123)">Otiria Marae (N123)</option>';
+            Marae_options_str  += '<option value="Owae Whaitara Marae (TM5)">Owae Whaitara Marae (TM5)</option>';
+            Marae_options_str  += '<option value="Pahaoa Marae (BOP165)">Pahaoa Marae (BOP165)</option>';
+            Marae_options_str  += '<option value="Painoaiho Marae (BOP138)">Painoaiho Marae (BOP138)</option>';
+            Marae_options_str  += '<option value="Pakirikiri Marae (G40)">Pakirikiri Marae (G40)</option>';
+            Marae_options_str  += '<option value="Papatuanuku Kokiri Marae (A31)">Papatuanuku Kokiri Marae (A31)</option>';
+            Marae_options_str  += '<option value="Parikino Pa (TM61)">Parikino Pa (TM61)</option>';
+            Marae_options_str  += '<option value="Pikitu Marae (W85)">Pikitu Marae (W85)</option>';
+            Marae_options_str  += '<option value="Potahi Marae (N61)">Potahi Marae (N61)</option>';
+            Marae_options_str  += '<option value="Puketawai Marae (G42)">Puketawai Marae (G42)</option>';
+            Marae_options_str  += '<option value="Punawhakareia Marae (BOP65)">Punawhakareia Marae (BOP65)</option>';
+            Marae_options_str  += '<option value="Puniho Pa Marae (TM12)">Puniho Pa Marae (TM12)</option>';
+            Marae_options_str  += '<option value="Purekireki Marae (W63)">Purekireki Marae (W63)</option>';
+            Marae_options_str  += '<option value="Rangataua Marae (BOP112)">Rangataua Marae (BOP112)</option>';
+            Marae_options_str  += '<option value="Rangatira Marae (G54)">Rangatira Marae (G54)</option>';
+            Marae_options_str  += '<option value="Rangitihi Marae (BOP74)">Rangitihi Marae (BOP74)</option>';
+            Marae_options_str  += '<option value="Rangiwaho Marae (G47)">Rangiwaho Marae (G47)</option>';
+            Marae_options_str  += '<option value="Rata Marae (G46)">Rata Marae (G46)</option>';
+            Marae_options_str  += '<option value="Raupunga Te Huki Marae (NHB19)">Raupunga Te Huki Marae (NHB19)</option>';
+            Marae_options_str  += '<option value="Reporua Marae (G14)">Reporua Marae (G14)</option>';
+            Marae_options_str  += '<option value="Roma Marae (N73)">Roma Marae (N73)</option>';
+            Marae_options_str  += '<option value="Rongomaipapa Marae (BOP34)">Rongomaipapa Marae (BOP34)</option>';
+            Marae_options_str  += '<option value="Ruapeka Marae (BOP32)">Ruapeka Marae (BOP32)</option>';
+            Marae_options_str  += '<option value="Runanga Marae (NHB44)">Runanga Marae (NHB44)</option>';
+            Marae_options_str  += '<option value="Taharua Marae (W29)">Taharua Marae (W29)</option>';
+            Marae_options_str  += '<option value="Tahuwhakatiki Marae (BOP24)">Tahuwhakatiki Marae (BOP24)</option>';
+            Marae_options_str  += '<option value="Taihoa Marae (NHB36)">Taihoa Marae (NHB36)</option>';
+            Marae_options_str  += '<option value="Takapuwahia Marae (WLG14)">Takapuwahia Marae (WLG14)</option>';
+            Marae_options_str  += '<option value="Takipu Marae (G55)">Takipu Marae (G55)</option>';
+            Marae_options_str  += '<option value="Takitimu Marae (NHB32)">Takitimu Marae (NHB32)</option>';
+            Marae_options_str  += '<option value="Takou Marae (N12)">Takou Marae (N12)</option>';
+            Marae_options_str  += '<option value="Taraia Marae (NHB54)">Taraia Marae (NHB54)</option>';
+            Marae_options_str  += '<option value="Taupo Marae (N58)">Taupo Marae (N58)</option>';
+            Marae_options_str  += '<option value="Tauranga Ika Marae (TM33)">Tauranga Ika Marae (TM33)</option>';
+            Marae_options_str  += '<option value="Tawhiti a Maru Marae (NHB65)">Tawhiti a Maru Marae (NHB65)</option>';
+            Marae_options_str  += '<option value="Te Atihau Marae (NHB64)">Te Atihau Marae (NHB64)</option>';
+            Marae_options_str  += '<option value="Te Awamarahi Marae (W2)">Te Awamarahi Marae (W2)</option>';
+            Marae_options_str  += '<option value="Te Hora Marae (TWP4)">Te Hora Marae (TWP4)</option>';
+            Marae_options_str  += '<option value="Te Kooraha Marae (W47)">Te Kooraha Marae (W47)</option>';
+            Marae_options_str  += '<option value="Te Kopua Marae (W62)">Te Kopua Marae (W62)</option>';
+            Marae_options_str  += '<option value="Te Koura Putaroa Marae (W145)">Te Koura Putaroa Marae (W145)</option>';
+            Marae_options_str  += '<option value="Te Mangungu Marae (WLG27)">Te Mangungu Marae (WLG27)</option>';
+            Marae_options_str  += '<option value="Te Papatapu Marae (W38)">Te Papatapu Marae (W38)</option>';
+            Marae_options_str  += '<option value="Te Patunga Marae (N6)">Te Patunga Marae (N6)</option>';
+            Marae_options_str  += '<option value="Te Potaka Marae (TM9)">Te Potaka Marae (TM9)</option>';
+            Marae_options_str  += '<option value="Te Rangihouhiri II (BOP109)">Te Rangihouhiri II (BOP109)</option>';
+            Marae_options_str  += '<option value="Te Rangimarie Marae (TM76)">Te Rangimarie Marae (TM76)</option>';
+            Marae_options_str  += '<option value="Te Rereatuk?hia Marae (BOP3)">Te Rereatuk?hia Marae (BOP3)</option>';
+            Marae_options_str  += '<option value="Te Rongoroa Marae (W146)">Te Rongoroa Marae (W146)</option>';
+            Marae_options_str  += '<option value="Te Tauraka Waka a Maui Marae (TWP27)">Te Tauraka Waka a Maui Marae (TWP27)</option>';
+            Marae_options_str  += '<option value="Te Umuroa Marae (BOP155)">Te Umuroa Marae (BOP155)</option>';
+            Marae_options_str  += '<option value="Te Wairoa-iti Marae (TM36)">Te Wairoa-iti Marae (TM36)</option>';
+            Marae_options_str  += '<option value="Te Whare o Toroa (BOP116)">Te Whare o Toroa (BOP116)</option>';
+            Marae_options_str  += '<option value="Tini Waitara Marae (TM55)">Tini Waitara Marae (TM55)</option>';
+            Marae_options_str  += '<option value="Torere Marae (BOP117)">Torere Marae (BOP117)</option>';
+            Marae_options_str  += '<option value="Tuamatene Marae (TWP7)">Tuamatene Marae (TWP7)</option>';
+            Marae_options_str  += '<option value="Waikotikoti Marae (BOP132)">Waikotikoti Marae (BOP132)</option>';
+            Marae_options_str  += '<option value="Waiokura Marae (TM20)">Waiokura Marae (TM20)</option>';
+            Marae_options_str  += '<option value="Waipapa Marae (W45)">Waipapa Marae (W45)</option>';
+            Marae_options_str  += '<option value="Waipatu Marae (NHB50)">Waipatu Marae (NHB50)</option>';
+            Marae_options_str  += '<option value="Waitetoko Marae (W126)">Waitetoko Marae (W126)</option>';
+            Marae_options_str  += '<option value="Waiwhetu Marae (WLG16)">Waiwhetu Marae (WLG16)</option>';
+            Marae_options_str  += '<option value="Whaakirangi Marae (NHB33)">Whaakirangi Marae (NHB33)</option>';
+            Marae_options_str  += '<option value="Whakaki Marae (NHB6)">Whakaki Marae (NHB6)</option>';
+            Marae_options_str  += '<option value="Whakataki Marae (WLG22)">Whakataki Marae (WLG22)</option>';
+            Marae_options_str  += '<option value="Whanau Maria Marae (W144)">Whanau Maria Marae (W144)</option>';
+            Marae_options_str  += '<option value="Whangaehu Marae (TM56)">Whangaehu Marae (TM56)</option>';
+            Marae_options_str  += '<option value="Whetu Marama ki te Ao Hou (N13)">Whetu Marama ki te Ao Hou (N13)</option>';
+            Marae_options_str  += '<option value="Whitianga Marae (BOP124)">Whitianga Marae (BOP124)</option>';
+            sel_Marae.innerHTML = Marae_options_str;
+            div_Marae.appendChild(sel_Marae);
+            var lab_Marae = document.createElement('div');
+            lab_Marae.innerHTML = 'Marae';
+            lab_Marae.className = 'filterlabel';
+            div_Marae.appendChild(lab_Marae);
+            var reset_Marae = document.createElement('div');
+            reset_Marae.innerHTML = 'clear filter';
+            reset_Marae.className = 'filterlabel';
+            reset_Marae.onclick = function() {
+                var options = document.getElementById("sel_Marae").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Marae.appendChild(reset_Marae);
+            document.getElementById("menu").appendChild(
+                document.createElement("div"));
+            var div_Regions = document.createElement('div');
+            div_Regions.id = "div_Regions";
+            div_Regions.className= "filterselect";
+            document.getElementById("menu").appendChild(div_Regions);
+            sel_Regions = document.createElement('select');
+            sel_Regions.multiple = true;
+            sel_Regions.size = 10;
+            sel_Regions.id = "sel_Regions";
+            var Regions_options_str = "<option value='' unselected></option>";
+            sel_Regions.onchange = function(){filterFunc()};
+            Regions_options_str  += '<option value="Manawatū-Whanganui">Manawatū-Whanganui</option>';
+            Regions_options_str  += '<option value="Murihiku (Southland)">Murihiku (Southland)</option>';
+            Regions_options_str  += '<option value="Taranaki">Taranaki</option>';
+            Regions_options_str  += '<option value="Te Matau-a-Māui (Hawke&apos;s Bay)">Te Matau-a-Māui (Hawke&apos;s Bay)</option>';
+            Regions_options_str  += '<option value="Te Moana-a-Toi (Bay of Plenty)">Te Moana-a-Toi (Bay of Plenty)</option>';
+            Regions_options_str  += '<option value="Te Tai Poutini (West Coast)">Te Tai Poutini (West Coast)</option>';
+            Regions_options_str  += '<option value="Te Tai Tokerau (Northland)">Te Tai Tokerau (Northland)</option>';
+            Regions_options_str  += '<option value="Te Tai-o-Aorere (Tasman)">Te Tai-o-Aorere (Tasman)</option>';
+            Regions_options_str  += '<option value="Te Tairāwhiti (Gisborne)">Te Tairāwhiti (Gisborne)</option>';
+            Regions_options_str  += '<option value="Te Tauihu-o-te-waka (Marlborough)">Te Tauihu-o-te-waka (Marlborough)</option>';
+            Regions_options_str  += '<option value="Te Whanga-nui-a-Tara (Wellington)">Te Whanga-nui-a-Tara (Wellington)</option>';
+            Regions_options_str  += '<option value="Tāmaki-makau-rau (Aucland)">Tāmaki-makau-rau (Aucland)</option>';
+            Regions_options_str  += '<option value="Waikato">Waikato</option>';
+            Regions_options_str  += '<option value="Waitaha (Canterbury)">Waitaha (Canterbury)</option>';
+            Regions_options_str  += '<option value="Whakatū (Nelson)">Whakatū (Nelson)</option>';
+            Regions_options_str  += '<option value="Ōtākou (Otago)">Ōtākou (Otago)</option>';
+            sel_Regions.innerHTML = Regions_options_str;
+            div_Regions.appendChild(sel_Regions);
+            var lab_Regions = document.createElement('div');
+            lab_Regions.innerHTML = 'Regions';
+            lab_Regions.className = 'filterlabel';
+            div_Regions.appendChild(lab_Regions);
+            var reset_Regions = document.createElement('div');
+            reset_Regions.innerHTML = 'clear filter';
+            reset_Regions.className = 'filterlabel';
+            reset_Regions.onclick = function() {
+                var options = document.getElementById("sel_Regions").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Regions.appendChild(reset_Regions);
+        </script>
+    </body>
+</html>
